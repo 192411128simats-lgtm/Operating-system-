@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_USERS 5
+#define MAX_FILES 5
+
+// User structure
+struct User {
+    char name[20];
+    int uid;  // unique ID
+    int gid;  // group ID
+};
+
+// File structure
+struct File {
+    char name[20];
+    int owner_uid;
+    int group_gid;
+    int permission; // rwx in octal (e.g., 751)
+};
+
+// Function to check access
+void check_access(struct User u, struct File f) {
+    int perm = f.permission;
+    int access = -1;
+
+    if (u.uid == f.owner_uid) {
+        access = perm / 100;  // owner permissions
+    } else if (u.gid == f.group_gid) {
+        access = (perm / 10) % 10;  // group permissions
+    } else {
+        access = perm % 10;  // others permissions
+    }
+
+    printf("Access for user %s on file %s:\n", u.name, f.name);
+    printf("Read: %s\n", (access & 4) ? "Yes" : "No");
+    printf("Write: %s\n", (access & 2) ? "Yes" : "No");
+    printf("Execute: %s\n", (access & 1) ? "Yes" : "No");
+}
+
+int main() {
+    struct User users[MAX_USERS] = {
+        {"naga", 1001, 10},
+        {"ravi", 1002, 10},
+        {"sita", 1003, 11}
+    };
+
+    struct File files[MAX_FILES] = {
+        {"file1.txt", 1001, 10, 754},  // rwxr-xr--
+        {"script.sh", 1002, 10, 751},  // rwxr-x--x
+        {"data.csv", 1003, 11, 640}    // rw-r-----
+    };
+
+    int user_index, file_index;
+    printf("Select User:\n0: naga  1: ravi  2: sita\n");
+    scanf("%d", &user_index);
+    printf("Select File:\n0: file1.txt 1: script.sh 2: data.csv\n");
+    scanf("%d", &file_index);
+
+    check_access(users[user_index], files[file_index]);
+
+    return 0;
+}
