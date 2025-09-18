@@ -1,0 +1,25 @@
+class ReaderThread extends Thread {
+    private int[] data;
+    private int start, end;
+
+    ReaderThread(int[] data, int start, int end) {
+        this.data = data;
+        this.start = start;
+        this.end = end;
+    }
+
+    public void run() {
+        for (int i = start; i < end; i++) {
+            System.out.println(getName() + " read: " + data[i]);
+            try { Thread.sleep(200); } catch (InterruptedException e) {}
+        }
+    }
+}
+
+public class MultiThreadReading {
+    public static void main(String[] args) {
+        int[] numbers = {10, 20, 30, 40, 50, 60, 70, 80};
+
+        // Two threads reading different parts of array
+        Thread t1 = new ReaderThread(numbers, 0, 4); // reads first half
+        Threa
