@@ -1,0 +1,54 @@
+import java.util.concurrent.Semaphore;
+
+class DiningPhilosophers {
+    static class Philosopher extends Thread {
+        private int id;
+        private Semaphore leftChopstick, rightChopstick;
+
+        Philosopher(int id, Semaphore left, Semaphore right) {
+            this.id = id;
+            this.leftChopstick = left;
+            this.rightChopstick = right;
+        }
+
+        private void think() throws InterruptedException {
+            System.out.println("Philosopher " + id + " is thinking.");
+            Thread.sleep((int)(Math.random() * 1000));
+        }
+
+        private void eat() throws InterruptedException {
+            System.out.println("Philosopher " + id + " is eating.");
+            Thread.sleep((int)(Math.random() * 1000));
+        }
+
+        public void run() {
+            try {
+                while (true) {
+                    think();
+                    // pick chopsticks
+                    leftChopstick.acquire();
+                    rightChopstick.acquire();
+
+                    eat();
+
+                    // put chopsticks back
+                    leftChopstick.release();
+                    rightChopstick.release();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int n = 5;
+        Semaphore[] chopsticks = new Semaphore[n];
+        for (int i = 0; i < n; i++) {
+            chopsticks[i] = new Semaphore(1); // 1 chopstick each
+        }
+
+        for (int i = 0; i < n; i++) {
+            Semaphore left = chopsticks[i];
+            Semaphore right = chopsticks[(i + 1) % n];
+            // p
