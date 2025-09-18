@@ -1,0 +1,61 @@
+import java.util.*;
+
+public class RoundRobinSimple {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        int[] bt = new int[n];   // burst times
+        int[] wt = new int[n];   // waiting times
+        int[] tat = new int[n];  // turnaround times
+
+        System.out.println("Enter burst times:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("P" + (i+1) + ": ");
+            bt[i] = sc.nextInt();
+        }
+
+        System.out.print("Enter time quantum: ");
+        int quantum = sc.nextInt();
+
+        int[] rem = Arrays.copyOf(bt, n); // remaining times
+        int t = 0; // current time
+
+        while (true) {
+            boolean done = true;
+            for (int i = 0; i < n; i++) {
+                if (rem[i] > 0) {
+                    done = false;
+                    if (rem[i] > quantum) {
+                        t += quantum;
+                        rem[i] -= quantum;
+                    } else {
+                        t += rem[i];
+                        wt[i] = t - bt[i];  // waiting time
+                        rem[i] = 0;
+                    }
+                }
+            }
+            if (done) break;
+        }
+
+        double avgWT = 0, avgTAT = 0;
+        for (int i = 0; i < n; i++) {
+            tat[i] = bt[i] + wt[i];
+            avgWT += wt[i];
+            avgTAT += tat[i];
+        }
+
+        System.out.println("\nProcess\tBT\tWT\tTAT");
+        for (int i = 0; i < n; i++) {
+            System.out.println("P" + (i+1) + "\t" + bt[i] + "\t" + wt[i] + "\t" + tat[i]);
+        }
+
+        System.out.println("\nAverage Waiting Time: " + (avgWT/n));
+        System.out.println("Average Turnaround Time: " + (avgTAT/n));
+
+        sc.close();
+    }
+}
